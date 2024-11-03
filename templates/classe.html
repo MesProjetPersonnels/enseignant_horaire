@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Appartements</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            position: fixed;
+            height: 100%;
+        }
+        .sidebar .nav-link {
+            display: flex;
+            align-items: center;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+            background-color: #ecf0f1;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #bdc3c7;
+            padding: 10px 20px;
+            border-bottom: 1px solid #95a5a6;
+        }
+        .header .profile {
+            display: flex;
+            align-items: center;
+        }
+        .header .profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .header .notifications {
+            display: flex;
+            align-items: center;
+        }
+        .header .notifications .badge {
+            margin-left: 10px;
+        }
+        .table thead th {
+            background-color: #bdc3c7;
+        }
+        #apartmentForm {
+            display: none;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        .nav-link {
+         color: black;
+         text-decoration: none;
+        }
+
+    .active {
+        background-color:  black;
+    }
+    /* styles.css */
+.btn {
+    color: black;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.btndelete {
+    color: red; /* Couleur au survol */
+}
+.btnedit{
+    color: yellow;
+}
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/"><i class="fa fa-home"></i> Accueil</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/enseignants"><i class="fa fa-chalkboard-teacher"></i> Enseignants</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/niveaux"><i class="fa fa-layer-group"></i> Niveau</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/Cours"><i class="fa fa-book"></i> Cours</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white active" href="/classe"><i class="fa fa-school"></i> Classe</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/options"><i class="fa fa-th-list"></i> Option</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/attributions_cours"><i class="fa fa-tasks"></i> Attribution des Cours</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/horaires"><i class="fa fa-clock"></i> Horaire</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/utilisateur"><i class="fa fa-user"></i> Utilisateur</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/site_acceuil"><i class="fa fa-globe"></i> Notre Site</a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="content">
+        <div class="header">
+            <div class="dropdown notifications">
+                <button class="btn btn-light dropdown-toggle" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-bell"></i> Notifications <span class="badge badge-danger">
+                        {% for i in nbnotif %}
+
+                        {{i[0]}}
+                    {%endfor%}
+                    </span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
+                    
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-bell"></i> kkkkk</a></li>
+
+                </ul>
+            </div>
+            <div class="dropdown messages">
+                <a class="btn btn-light dropdown-toggle" id="messageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-envelope"></i> Messages <span class="badge badge-danger">7
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="messageDropdown">
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-envelope"></i> jjjjj<a></li>
+                </ul>
+            </div>
+            <div class="dropdown profile">
+                <button class="btn btn-light dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="../static/uploads/{{image}}" alt="Profile Picture"> {{firstname}} {{lastname}}
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" href="/profile">Votre Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/deconnexion">Deconnexion</a></li>
+                </ul>
+            </div>
+        </div>z
+    
+        
+
+        <h1>Gestion des Classes</h1>
+        <button class="btn btn-primary mb-3" onclick="toggleForm()">Ajouter une classe</button>
+
+            {% if status!=none %}
+            <div class="alert alert-{{status}} alert-dismissible fade show mt-1" role="alert">
+                {{msg}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">x</button>
+            </div>
+            {% endif %}
+
+            <!-- modal de suppression-->
+            <!-- modale de suppression -->
+    <div class="modal fade" id="modalSuppression" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Suppression</h1>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div class="card-body">
+              <p class="card-text">Confirmez-vous la suppression définitive de <b id="label" class="text-dark"> </b> ? Il
+                  est important de noter que cette action est définitive et ne peut être révoquée.</p>
+          </div>
+        <div class="modal-footer">
+          <form  method="post" action="/supprimer_classe">
+              <input type="text" id="idDel" name="idDel" >
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Non</button>
+              <input type="submit" class="btn btn-primary" value="Oui">
+          </form>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+     
+    
+        <form id="apartmentForm" action="/enregistrer_classe" method="post" enctype="multipart/form-data">
+            <div class="form-row">
+                <input type="text" name="idUp" id="idUp" hidden>
+                <div class="form-group col-md-4">
+                    <label for="description">Description</label>
+                    <input type="text" class="form-control" id="nom" name="nom"required  placeholder="Entrez la description">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="description">Niveaux</label>
+                    <select class="form-control" id="niveaux" name="niveaux" required>
+                        {% for i in niveaux %}
+                        <option value="{{i[0]}}">{{i[1]}}</option>
+                        {%endfor%}
+                    </select>
+                </div>
+                <div class="form-group col-md-4"  >
+                    <label for="description">Options</label>
+                    <select  id="option" name="option" class="form-control" required>
+                        {% for i in options %}
+                        <option value="{{i[0]}}">{{i[1]}}</option>
+                        {%endfor%}
+                    </select>
+                </div>
+            </div>
+            <input type="submit" value="Ajouter" class="btn btn-primary">
+            <button type="button" class="btn btn-secondary" onclick="cancelForm()">Annuler</button>
+        </form>
+        <table class="table mt-4" id="matable">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Description</th>
+                    <th>Niveaux</th>
+                    <th>Options</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="apartmentTableBody">
+                {% for i in data %}
+
+                <tr>
+                    <td>{{i[0]}}</td>
+                    <td>{{i[1]}}</td>
+                    <td>{{i[5]}}</td>
+                    <td>{{i[4]}}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="setUpdateForm('{{i[0]}}','{{i[1]}}','{{i[2]}}','{{i[3]}}' )">Mod</button>
+                         <a class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalSuppression" onclick="setDelete('{{i[0]}}')" href="/suprimer_categorie_apartement/">sup</a>
+                    </td>
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
+        
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let editIndex = -1;
+
+        function toggleForm() {
+            var form = document.getElementById('apartmentForm');
+           // if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+           // } /* else {
+             //   form.style.display = 'none';
+           // } */
+        }
+        function blockForm(){
+            var form = document.getElementById('apartmentForm');
+            form.style.display = 'none';
+        }
+
+        function cancelForm() {
+            document.getElementById('apartmentForm').reset();
+            blockForm();
+            editIndex = -1;
+        }
+        function setUpdateForm(id,nom,niveaux,option) {
+            toggleForm();
+            document.getElementById('idUp').value = id;
+            document.getElementById('nom').value = nom;
+            document.getElementById('option').value = option;
+            document.getElementById('niveaux').value = niveaux;
+        }
+        
+        
+        function setDelete(id) {
+            document.getElementById('idDel').value = id;
+        }
+        function addApartment() {
+            var name = document.getElementById('apartmentName').value;
+            var price = document.getElementById('apartmentPrice').value;
+            var address = document.getElementById('apartmentAddress').value;
+            var category = document.getElementById('apartmentCategory').value;
+            var detail = document.getElementById('apartmentDetail').value;
+
+            var table = document.getElementById('apartmentTableBody');
+
+            if (editIndex === -1) {
+                var rowCount = table.rows.length;
+                var row = table.insertRow(rowCount);
+
+                row.insertCell(0).innerHTML = rowCount + 1;
+                row.insertCell(1).innerHTML = name;
+                row.insertCell(2).innerHTML = address;
+                row.insertCell(3).innerHTML = detail;
+                row.insertCell(4).innerHTML = price;
+                row.insertCell(5).innerHTML = category;
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+    const currentLocation = location.pathname;
+    const menuItems = document.querySelectorAll('.nav-link');
+
+    menuItems.forEach(item => {
+        if (item.getAttribute('href') === currentLocation) {
+            item.classList.add('active');
+        }
+    });
+})
+        </script>
+         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.js"></script>
+    </body>
+</html>
